@@ -40,6 +40,7 @@ script:
 
   # Build a keycloak image
   - docker build
+    --cache-from manaty/keycloak:${KC_IMAGE_TAG}
     --tag manaty/keycloak:${KC_IMAGE_TAG}
     --build-arg BUILDKIT_INLINE_CACHE=1
     -f docker/Dockerfile ./docker
