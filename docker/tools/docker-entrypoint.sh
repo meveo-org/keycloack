@@ -108,18 +108,18 @@ if [[ -n ${DB_VENDOR:-} ]]; then
 fi
 
 # Detect DB vendor from default host names
-if [[ -z ${DB_VENDOR:-} ]]; then
-    if (getent hosts postgres &>/dev/null); then
-        export DB_VENDOR="postgres"
-    fi
-fi
+#if [[ -z ${DB_VENDOR:-} ]]; then
+#    if (getent hosts postgres &>/dev/null); then
+#        export DB_VENDOR="postgres"
+#    fi
+#fi
 
 # Detect DB vendor from legacy `*_ADDR` environment variables
-if [[ -z ${DB_VENDOR:-} ]]; then
-    if (printenv | grep '^POSTGRES_ADDR=' &>/dev/null); then
-        export DB_VENDOR="postgres"
-    fi
-fi
+#if [[ -z ${DB_VENDOR:-} ]]; then
+#    if (printenv | grep '^POSTGRES_ADDR=' &>/dev/null); then
+#        export DB_VENDOR="postgres"
+#    fi
+#fi
 
 # Default to H2 if DB type not detected
 if [[ -z ${DB_VENDOR:-} ]]; then
