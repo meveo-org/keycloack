@@ -1,0 +1,2 @@
+# Change only the database location for docker volume mapping.
+/subsystem=datasources/data-source=KeycloakDS:write-attribute(name=connection-url, value="jdbc:h2:${jboss.server.data.dir}/keycloakdb/keycloak;AUTO_SERVER=TRUE")
