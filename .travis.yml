@@ -1,6 +1,7 @@
 language: bash
 services: docker
 os: linux
+dist: bionic
 
 env:
   global:
