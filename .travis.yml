@@ -45,10 +45,10 @@ script:
     --build-arg BUILDKIT_INLINE_CACHE=1
     -f docker/Dockerfile ./docker
 
-after_script:
-  - docker images
-
 after_success:
-  - docker push manaty/keycloak:${KC_IMAGE_TAG}
   - docker tag manaty/keycloak:${KC_IMAGE_TAG} manaty/keycloak:10.0.2
   - docker push manaty/keycloak:10.0.2
+  - docker push manaty/keycloak:${KC_IMAGE_TAG}
+
+after_script:
+  - docker images
