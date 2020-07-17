@@ -12,19 +12,19 @@ To build a keycloak docker image
 
 
 
-## Usage
+## How to use with meveo container on localhost
 
-To boot in standalone mode
+Run Keycloak container using [docker-compose.yml](docker-compose.yml) on localhost, and it will map keycloak server port to 8081 locally
 
-    docker run manaty/keycloak
+    docker-compose up -d
 
+Add an host entry for local keycloak server to hosts file. `/etc/hosts` in Linux system, `C:/Windows/System32/drivers/etc/hosts` in Windows system.
 
+    127.0.0.1 kc-server
 
-## Expose on localhost
+Add an environment varaible to meveo container. 
 
-To be able to open Keycloak on localhost map port 8080 locally
-
-    docker run -p 8080:8080 manaty/keycloak
+    KEYCLOAK_URL: http://kc-server:8081/auth
 
 
 
@@ -43,11 +43,6 @@ Then restarting the container:
 
     docker restart <CONTAINER>
 
-### Providing the username and password via files
-
-By appending `_FILE` to the two environment variables used above (`KEYCLOAK_USER_FILE` and `KEYCLOAK_PASSWORD_FILE`),
-the information can be provided via files instead of plain environment variable values.
-The configuration and secret support in Docker Swarm is a perfect match for this use case. 
 
 
 ## Importing a realm
@@ -56,6 +51,7 @@ To create an admin account and import a previously exported realm run:
 
     docker run -e KEYCLOAK_USER=<USERNAME> -e KEYCLOAK_PASSWORD=<PASSWORD> \
         -e KEYCLOAK_IMPORT=/tmp/example-realm.json -v /tmp/example-realm.json:/tmp/example-realm.json manaty/keycloak
+
 
 
 ## Exporting a realm
@@ -92,51 +88,8 @@ To set your custom theme as the default global theme, use the following environm
 * `KEYCLOAK_DEFAULT_THEME`: Specify the theme to use as the default global theme (must match an existing theme name, if empty will use keycloak)
 
 
-## Adding a custom provider
-
-To add a custom provider extend the Keycloak image and add the provider to the `/opt/jboss/keycloak/standalone/deployments/`
-directory.
-
-
-## Running custom scripts on startup
-
-**Warning**: Custom scripts have no guarantees. The directory layout within the image may change at any time.
-
-To run custom scripts on container startup place a file in the `/opt/jboss/startup-scripts` directory.
-
-Two types of scripts are supported:
-
-* WildFly `.cli` [scripts](https://docs.jboss.org/author/display/WFLY/Command+Line+Interface). In most of the cases, the scripts should operate in [offline mode](https://wildfly.org/news/tags/CLI/) (using `embed-server` instruction). 
-
-* Any executable (`chmod +x`) script
-
-Scripts are ran in alphabetical order.
-
-### Adding custom script using Dockerfile
-
-A custom script can be added by creating your own `Dockerfile`:
-
-```
-FROM manaty/keycloak
-COPY custom-scripts/ /opt/jboss/startup-scripts/
-```
-
-### Adding custom script using volumes
-
-A single custom script can be added as a volume: `docker run -v /some/dir/my-script.cli:/opt/jboss/startup-scripts/my-script.cli`
-Or you can volume the entire directory to supply a directory of scripts.
-
-Note that when combining the approach of extending the image and `volume`ing the entire directory, the volume will override
-all scripts shipped in the image.
-
 
 ## Misc
-
-### Specify frontend base URL
-
-To set a fixed base URL for frontend requests use the following environment value (this is highly recommended in production):
-
-* `KEYCLOAK_FRONTEND_URL`: Specify base URL for Keycloak (optional, default is retrieved from request)
 
 ### Specify log level
 
@@ -158,14 +111,3 @@ Log level can also be changed at runtime, for example (assuming docker exec acce
 When running Keycloak behind a proxy, you will need to enable proxy address forwarding.
 
     docker run -e PROXY_ADDRESS_FORWARDING=true manaty/keycloak
-
-### Setting up TLS(SSL)
-
-Keycloak image allows you to specify both a private key and a certificate for serving HTTPS. In that case you need to provide two files:
-
-* tls.crt - a certificate
-* tls.key - a private key
-
-Those files need to be mounted in `/etc/x509/https` directory. The image will automatically convert them into a Java keystore and reconfigure Wildfly to use it.
-
-It is also possible to provide an additional CA bundle and setup Mutual TLS this way. In that case, you need to mount an additional volume (or multiple volumes) to the image. These volumes should contain all necessary `crt` files. The final step is to configure the `X509_CA_BUNDLE` environment variable to contain a list of the locations of the various CA certificate bundle files specified before, separated by space (` `). In case of an OpenShift environment, that could be `/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt /var/run/secrets/kubernetes.io/serviceaccount/ca.crt`.
