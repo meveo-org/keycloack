@@ -12,7 +12,7 @@ services:
       - keycloak_data:/opt/jboss/keycloak/standalone/data/keycloakdb
     environment:
       #PROXY_ADDRESS_FORWARDING: "true"   # Need to uncomment if keycloak server is behind proxy.
-      KEYCLOAK_USER: [ADMIN_USERNAME]
-      KEYCLOAK_PASSWORD: [ADMIN_PASSWORD]
+      KEYCLOAK_USER: kc.admin
+      KEYCLOAK_PASSWORD: admin
     ports:
       - 8081:8080
